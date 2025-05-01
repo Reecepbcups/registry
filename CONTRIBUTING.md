@@ -141,7 +141,7 @@ To start the warg server using `in memory` state store, run the following comman
 # Specify the required private key of the server operator
 export WARG_OPERATOR_KEY=ecdsa-p256:I+UlDo0HxyBBFeelhPPWmD+LnklOpqZDkrFP5VduASk=;
 
-docker compose up -d
+docker compose up
 ```
 
 To start the warg server using `postgres` state store, run the following commands:
@@ -151,7 +151,7 @@ export WARG_OPERATOR_KEY=ecdsa-p256:I+UlDo0HxyBBFeelhPPWmD+LnklOpqZDkrFP5VduASk=
 # Specify the required password for postgres
 export POSTGRES_PASSWORD=U9Vu62udJho584TFF44X;
 
-docker compose -f ./docker-compose.yaml -f ./docker-compose.postgres.yaml up -d 
+docker compose -f ./docker-compose.yaml -f ./docker-compose.postgres.yaml up -d
 ```
 
 If you want to watch file changes and rebuild the container during development, run the following commands instead:

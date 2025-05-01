@@ -14,9 +14,7 @@ services:
         - path: .
           action: rebuild
     environment:
-      WARG_OPERATOR_KEY_FILE: /run/secrets/warg_operator_key
-    secrets:
-      - warg_operator_key
+      WARG_OPERATOR_KEY: ecdsa-p256:I+UlDo0HxyBBFeelhPPWmD+LnklOpqZDkrFP5VduASk=
     ports:
       - 8090:8090
     volumes:
@@ -24,10 +22,3 @@ services:
     depends_on:
       fix-permission:
         condition: service_completed_successfully
-
-secrets:
-  warg_operator_key:
-    environment: "WARG_OPERATOR_KEY"
-
-volumes:
-  content:

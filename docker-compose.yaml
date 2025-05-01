@@ -22,3 +22,6 @@ services:
     depends_on:
       fix-permission:
         condition: service_completed_successfully
+
+volumes:
+  content:

@@ -16,6 +16,9 @@ services:
     environment:
       WARG_OPERATOR_KEY: ecdsa-p256:I+UlDo0HxyBBFeelhPPWmD+LnklOpqZDkrFP5VduASk=
       WARG_NAMESPACE: example
+      WARG_CONTENT_BASE_URL: http://localhost:8090
+      WARG_LISTEN: 0.0.0.0:8090
+      WARG_VERBOSE: 1
     ports:
       - 8090:8090
     volumes:

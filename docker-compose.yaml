@@ -1,5 +1,8 @@
 name: warg-server
 
+# - docker compose down --rmi all && docker volume prune -a
+# docker compose up --remove-orphans --force-recreate --renew-anon-volumes
+
 services:
   fix-permission:
     image: busybox

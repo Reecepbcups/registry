@@ -524,9 +524,12 @@ impl DataStore for MemoryDataStore {
         };
 
         let start_log_idx = match since {
-            Some(since) => match &state.records[log_id][since] {
-                RecordStatus::Validated(record) => record.index + 1,
-                _ => unreachable!(),
+            Some(since) => {
+                match state.records.get(log_id).and_then(|records| records.get(since)) {
+                    Some(RecordStatus::Validated(record)) => record.index + 1,
+                    // If record not found or not in validated state, start from beginning
+                    _ => 0,
+                }
             },
             None => 0,
         };
@@ -563,9 +566,12 @@ impl DataStore for MemoryDataStore {
         };
 
         let start_log_idx = match since {
-            Some(since) => match &state.records[log_id][since] {
-                RecordStatus::Validated(record) => record.index + 1,
-                _ => unreachable!(),
+            Some(since) => {
+                match state.records.get(log_id).and_then(|records| records.get(since)) {
+                    Some(RecordStatus::Validated(record)) => record.index + 1,
+                    // If record not found or not in validated state, start from beginning
+                    _ => 0,
+                }
             },
             None => 0,
         };

@@ -1,11 +1,9 @@
 name: warg-server
 
+# - docker compose down --rmi all && docker volume prune -a
+# docker compose up --remove-orphans --force-recreate
+
 services:
-  fix-permission:
-    image: busybox
-    command: ["sh", "-c", "chown -R 1000:1000 /var/lib/warg-server/data"]
-    volumes:
-      - content:/var/lib/warg-server/data
 
   api:
     build: .
@@ -20,14 +18,6 @@ services:
       WARG_CONTENT_BASE_URL: http://localhost:8090
       WARG_LISTEN: 0.0.0.0:8090
       WARG_VERBOSE: 1
-      WKG_OCI_INSECURE: "localhost,127.0.0.1"
     ports:
       - 8090:8090
-    volumes:
-      - content:/var/lib/warg-server/data
-    depends_on:
-      fix-permission:
-        condition: service_completed_successfully
-
-volumes:
-  content:
+    command: ["--rm"]

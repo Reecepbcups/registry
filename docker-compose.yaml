@@ -1,30 +1,9 @@
 name: warg-server
 
 # - docker compose down --rmi all && docker volume prune -a
-# docker compose up --remove-orphans --force-recreate --renew-anon-volumes
+# docker compose up --remove-orphans --force-recreate
 
 services:
-  fix-permission:
-    image: busybox
-    command: ["sh", "-c", "chown -R 1000:1000 /var/lib/warg-server/data"]
-    volumes:
-      - content:/var/lib/warg-server/data
-
-  registry:
-    image: registry:3.0.0
-    container_name: oci-registry
-    restart: unless-stopped
-    environment:
-      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
-      - REGISTRY_LOG_LEVEL=debug
-      - REGISTRY_LOG_ACCESSLOG_DISABLED=true
-      - WKG_OCI_INSECURE="localhost,127.0.0.1"
-      # - OTEL_TRACES_EXPORTER=none
-      # - OTEL_SDK_DISABLED=true
-    # volumes:
-    #   - registry-data:/var/lib/registry
-    ports:
-      - 5000:5000
 
   api:
     build: .
@@ -35,20 +14,10 @@ services:
     environment:
       WARG_OPERATOR_KEY: ecdsa-p256:I+UlDo0HxyBBFeelhPPWmD+LnklOpqZDkrFP5VduASk=
       WARG_NAMESPACE: example
-      WKG_REGISTRY: http://127.0.0.1:5000
+      WKG_REGISTRY: http://localhost:8090
       WARG_CONTENT_BASE_URL: http://localhost:8090
       WARG_LISTEN: 0.0.0.0:8090
       WARG_VERBOSE: 1
-      WKG_OCI_INSECURE: "localhost,127.0.0.1"
     ports:
       - 8090:8090
-    volumes:
-      - content:/var/lib/warg-server/data
-    depends_on:
-      - fix-permission
-      - registry
-
-# TODO: remove volumes since this is temp anyways?
-volumes:
-  content:
-  # registry-data:
+    command: ["--rm"]

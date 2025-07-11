@@ -37,9 +37,6 @@ impl From<CoreServiceError> for ProofApiError {
             CoreServiceError::LeafNotFound(leaf) => ProofError::LeafNotFound(leaf),
             CoreServiceError::BundleFailure(e) => ProofError::BundleFailure(e.to_string()),
             CoreServiceError::PackageNotIncluded(id) => ProofError::PackageLogNotIncluded(id),
-            CoreServiceError::IncorrectProof { root, found } => {
-                ProofError::IncorrectProof { root, found }
-            }
             other => {
                 tracing::error!("Unhandled CoreServiceError: {other:?}");
                 ProofError::Message {

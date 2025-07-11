@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize, Serializer};
 use serde_with::{base64::Base64, serde_as};
 use std::borrow::Cow;
 use thiserror::Error;
-use warg_crypto::hash::AnyHash;
 use warg_protocol::registry::{LogId, RegistryIndex, RegistryLen};
 
 /// Represents a consistency proof request.
@@ -64,14 +63,6 @@ pub enum ProofError {
     /// Failed to prove inclusion of a package.
     #[error("failed to prove inclusion of package log `{0}`")]
     PackageLogNotIncluded(LogId),
-    /// The provided root for an inclusion proof was incorrect.
-    #[error("failed to prove inclusion: found root `{found}` but was given root `{root}`")]
-    IncorrectProof {
-        /// The provided root.
-        root: AnyHash,
-        /// The found root.
-        found: AnyHash,
-    },
     /// A failure was encountered while bundling proofs.
     #[error("failed to bundle proofs: {0}")]
     BundleFailure(String),
@@ -91,8 +82,7 @@ impl ProofError {
         match self {
             Self::CheckpointNotFound(_) | Self::LeafNotFound(_) => 404,
             Self::BundleFailure(_)
-            | Self::PackageLogNotIncluded(_)
-            | Self::IncorrectProof { .. } => 422,
+            | Self::PackageLogNotIncluded(_) => 422,
             Self::Message { status, .. } => *status,
         }
     }
@@ -110,10 +100,6 @@ enum EntityType {
 enum BundleError<'a> {
     PackageNotIncluded {
         log_id: Cow<'a, LogId>,
-    },
-    IncorrectProof {
-        root: Cow<'a, AnyHash>,
-        found: Cow<'a, AnyHash>,
     },
     Failure {
         message: Cow<'a, str>,
@@ -162,14 +148,6 @@ impl Serialize for ProofError {
                 },
             }
             .serialize(serializer),
-            Self::IncorrectProof { root, found } => RawError::BundleError {
-                status: Status::<422>,
-                error: BundleError::IncorrectProof {
-                    root: Cow::Borrowed(root),
-                    found: Cow::Borrowed(found),
-                },
-            }
-            .serialize(serializer),
             Self::BundleFailure(message) => RawError::BundleError {
                 status: Status::<422>,
                 error: BundleError::Failure {
@@ -200,10 +178,6 @@ impl<'de> Deserialize<'de> for ProofError {
                 BundleError::PackageNotIncluded { log_id } => {
                     Ok(Self::PackageLogNotIncluded(log_id.into_owned()))
                 }
-                BundleError::IncorrectProof { root, found } => Ok(Self::IncorrectProof {
-                    root: root.into_owned(),
-                    found: found.into_owned(),
-                }),
                 BundleError::Failure { message } => Ok(Self::BundleFailure(message.into_owned())),
             },
             RawError::Message { status, message } => Ok(Self::Message {
